@@ -1,7 +1,3 @@
-import { sql } from "@vercel/postgres";
-
-// main.js
-
 // Selecciona el botón por su ID
 const sendButton = document.getElementById("sendButton");
 
@@ -18,11 +14,22 @@ async function sendMsg() {
             return;
         }
 
-        // Asegúrate de que tienes una instancia de `sql` correctamente configurada aquí.
-        await sql`INSERT INTO messages (text) VALUES (${content})`;
-        
+        // Asegúrate de que `sql` esté configurado correctamente para la base de datos de Vercel
+        const response = await fetch("/api/messages", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ text: content })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
+        }
+
         console.log("Mensaje enviado correctamente");
     } catch (error) {
         console.error("Error al enviar el mensaje:", error);
+        alert("Hubo un error al enviar el mensaje. Inténtalo de nuevo más tarde.");
     }
 }
